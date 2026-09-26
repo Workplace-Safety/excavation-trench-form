@@ -1,0 +1,351 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-size: 11pt;
+    color: #343A40;
+    line-height: 1.6;
+    background: #f2f2f2;
+    padding: 0 0 36pt 0;
+}
+
+/* ---------- STICKY TOOLBAR ---------- */
+.toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #1E3A5F;
+    border-bottom: 3px solid #FF6B35;
+    padding: 10pt 16pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12pt;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.toolbar-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 10pt;
+    margin-inline-end: auto;
+    white-space: nowrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6pt;
+    border: none;
+    border-radius: 4pt;
+    padding: 9pt 16pt;
+    font-size: 10.5pt;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+    font-family: inherit;
+}
+.btn:hover { opacity: 0.9; }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.6; cursor: wait; }
+
+.btn-pdf { background: #DC143C; color: #ffffff; }
+.btn-word { background: #17A2B8; color: #ffffff; }
+.btn-reset { background: transparent; color: #E9ECEF; border: 1px solid #6C757D; }
+
+/* ---------- FORM WRAPPER ---------- */
+#printable {
+    display: block;
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-size: 11pt;
+    color: #343A40;
+    line-height: 1.6;
+    background: #ffffff;
+    padding: 36pt;
+    max-width: 8.5in;
+    margin: 24pt auto 0 auto;
+    box-shadow: 0 0 12px rgba(0,0,0,0.08);
+}
+
+.header {
+    background: linear-gradient(to bottom, #E9ECEF 0%, #FFFFFF 100%);
+    padding: 24pt 16pt;
+    border-bottom: 3px solid #FF6B35;
+    margin-bottom: 24pt;
+}
+
+h1 {
+    font-family: 'Roboto Condensed', 'Arial Narrow', sans-serif;
+    font-size: 24pt;
+    font-weight: 700;
+    color: #FF6B35;
+    margin-bottom: 12pt;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+}
+
+.header-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16pt;
+    margin-top: 16pt;
+}
+
+.info-field { margin-bottom: 8pt; }
+
+.info-label {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #6C757D;
+    display: block;
+    margin-bottom: 4pt;
+}
+
+.info-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #343A40;
+    padding: 4pt 0;
+    font-size: 11pt;
+    color: #343A40;
+    background: transparent;
+    font-family: inherit;
+}
+.info-input:focus { outline: none; border-bottom: 2px solid #FF6B35; }
+
+input[type="date"].info-input,
+input[type="time"].info-input {
+    color-scheme: light;
+    cursor: pointer;
+}
+
+h2 {
+    font-family: 'Roboto Condensed', 'Arial Narrow', sans-serif;
+    font-size: 18pt;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: #1E3A5F;
+    padding: 12pt 16pt;
+    margin: 32pt 0 16pt 0;
+    border-left: 4px solid #FF6B35;
+    text-transform: uppercase;
+}
+
+h3 {
+    font-family: 'Roboto Condensed', 'Arial Narrow', sans-serif;
+    font-size: 14pt;
+    font-weight: 700;
+    color: #343A40;
+    margin: 24pt 0 12pt 0;
+}
+
+/* ---------- STATUS SUMMARY (native radio buttons — plain green check only) ---------- */
+.status-summary {
+    background: #E9ECEF;
+    padding: 16pt;
+    border-radius: 4pt;
+    margin-bottom: 24pt;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16pt;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 12pt;
+    cursor: pointer;
+    user-select: none;
+}
+
+.radio-wrap-large {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.radio-hidden {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.radio-box-large {
+    position: absolute;
+    inset: 0;
+    border: 2px solid #343A40;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Every checked box, everywhere, shows the same plain green checkmark */
+.radio-hidden:checked + .radio-box-large,
+.radio-hidden:checked + .radio-box-small {
+    background: #28A745;
+    border-color: #1e7e34;
+}
+.radio-hidden:checked + .radio-box-large::after,
+.radio-hidden:checked + .radio-box-small::after {
+    content: '\2713';
+    color: #ffffff;
+}
+
+.checkbox-label { font-size: 11pt; font-weight: 600; color: #343A40; }
+
+/* ---------- CHECKLIST ITEMS ---------- */
+/* Text on top, choices (OK / Issue / N/A) stacked below it */
+.checklist-section { margin-bottom: 24pt; }
+
+.checklist-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8pt;
+    padding: 12pt 0;
+    border-bottom: 1px solid #E9ECEF;
+}
+.checklist-item:last-child { border-bottom: none; }
+
+.item-text { font-size: 11pt; color: #343A40; font-weight: 600; }
+
+.checkbox-container {
+    display: flex;
+    gap: 20pt;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 6pt;
+    cursor: pointer;
+    user-select: none;
+}
+
+.radio-wrap-small {
+    position: relative;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.radio-box-small {
+    position: absolute;
+    inset: 0;
+    border: 2px solid #343A40;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.checkbox-option-label { font-size: 10pt; color: #343A40; }
+
+.notes-section { margin: 24pt 0; }
+
+.notes-area {
+    width: 100%;
+    min-height: 96pt;
+    border: 1px solid #6C757D;
+    padding: 8pt;
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-size: 11pt;
+    color: #343A40;
+    resize: vertical;
+}
+.notes-area:focus { outline: none; border-color: #FF6B35; }
+
+.signature-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24pt;
+    margin: 32pt 0;
+    padding-top: 24pt;
+    border-top: 2px solid #E9ECEF;
+}
+
+.signature-box {
+    border: 2px dashed #6C757D;
+    padding: 16pt;
+    min-height: 96pt;
+    background: #FFFFFF;
+}
+
+.signature-label { font-weight: 600; color: #343A40; margin-bottom: 8pt; display: block; }
+.signature-line { border-bottom: 1px solid #343A40; padding: 8pt 0; margin-top: 48pt; }
+
+.date-time-row {
+    display: flex;
+    gap: 12pt;
+}
+.date-time-row .info-field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.footer {
+    margin-top: 32pt;
+    padding-top: 16pt;
+    border-top: 1px solid #6C757D;
+    font-size: 8pt;
+    color: #6C757D;
+    text-align: center;
+}
+
+.footer-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8pt; margin-bottom: 8pt; }
+
+.alert-box { background: #F8D7DA; border-left: 4px solid #DC143C; padding: 12pt; margin: 16pt 0; }
+.alert-text { color: #721C24; font-size: 10pt; font-weight: 600; }
+
+.info-box { background: #D1ECF1; border-left: 4px solid #17A2B8; padding: 12pt; margin: 16pt 0; }
+.info-text { color: #0C5460; font-size: 10pt; }
+
+.atmospheric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12pt;
+    margin: 16pt 0;
+    padding: 16pt;
+    background: #E9ECEF;
+    border-radius: 4pt;
+}
+
+@media print {
+    .toolbar { display: none !important; }
+    body { background: #fff; padding: 0; }
+    #printable { box-shadow: none; margin: 0 auto; padding: 0.5in; }
+    .radio-box-large, .radio-box-small {
+        border-color: #000000 !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #printable { padding: 16pt; }
+    .header-info, .status-summary, .atmospheric-grid, .signature-section {
+        grid-template-columns: 1fr;
+    }
+    .checkbox-container { flex-wrap: wrap; }
+    .toolbar { justify-content: center; }
+    .toolbar-title { width: 100%; text-align: center; margin-inline-end: 0; margin-bottom: 4pt; }
+}
