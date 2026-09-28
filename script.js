@@ -58,17 +58,13 @@
             html2canvas: {
                 scale: 2,
                 useCORS: true,
-                // Fixed capture width in pixels (8.5in page at 96dpi = 816px).
-                // We deliberately IGNORE the browser's actual window size here:
-                // on many laptops Windows "Display Scaling" (125%/150%, very
-                // common) confuses html2canvas's automatic width calculation
-                // and causes the left side of the PDF to be cropped. Forcing
-                // a fixed width makes the capture identical regardless of the
-                // viewer's display scaling setting.
-                width: 816,
-                windowWidth: 816,
-                scrollX: 0,
-                scrollY: 0
+                windowWidth: el.scrollWidth,
+                // Compensate for any horizontal/vertical scroll of the page the
+                // form is embedded in — without this, the captured image can be
+                // shifted/cropped on the left on some desktop browsers even
+                // though it looks fine on mobile.
+                scrollX: -window.scrollX,
+                scrollY: -window.scrollY
             },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
