@@ -55,7 +55,21 @@
             margin: 0.4,
             filename: 'Excavation-Trenching-Safety-Inspection.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, windowWidth: el.scrollWidth },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                // Fixed capture width in pixels (8.5in page at 96dpi = 816px).
+                // We deliberately IGNORE the browser's actual window size here:
+                // on many laptops Windows "Display Scaling" (125%/150%, very
+                // common) confuses html2canvas's automatic width calculation
+                // and causes the left side of the PDF to be cropped. Forcing
+                // a fixed width makes the capture identical regardless of the
+                // viewer's display scaling setting.
+                width: 816,
+                windowWidth: 816,
+                scrollX: 0,
+                scrollY: 0
+            },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
