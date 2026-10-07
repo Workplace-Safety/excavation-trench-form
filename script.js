@@ -8,6 +8,80 @@
         return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    // ---------- Text fields that wrap onto a new line ----------
+    // Every text field is a <textarea> that grows as you type, so long text
+    // drops to the next line instead of running off in one straight line.
+    var textFields = Array.prototype.slice.call(document.querySelectorAll('#printable textarea'));
+
+    function autoGrow(t) {
+        if (!t.scrollHeight) return;               // field not visible right now
+        t.style.height = 'auto';
+        t.style.height = (t.scrollHeight + (t.offsetHeight - t.clientHeight)) + 'px';
+    }
+    function growAll() { textFields.forEach(autoGrow); }
+
+    textFields.forEach(function (t) {
+        t.addEventListener('input', function () { autoGrow(t); });
+        if (t.classList.contains('info-input')) {
+            // one-line style fields: wrap automatically, but no manual Enter line breaks
+            t.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') e.preventDefault();
+            });
+        }
+    });
+    window.addEventListener('resize', growAll);
+    window.addEventListener('load', growAll);
+    growAll();
+    document.getElementById('printable').addEventListener('reset', function () {
+        setTimeout(function () {
+            textFields.forEach(function (t) { t.style.height = ''; });
+            growAll();
+        }, 0);
+    });
+
+    // ---------- PDF: draw text fields as plain wrapped text ----------
+    // html2canvas draws <textarea> content on ONE line and can overflow the page.
+    // So, only inside the PDF capture, each textarea is swapped for a normal
+    // <div> that wraps its text. Styles/values are read from the live form first.
+    function snapshotTextFields(root) {
+        var snap = {};
+        var keys = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'color',
+                    'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+                    'borderTop', 'borderRight', 'borderBottom', 'borderLeft'];
+        Array.prototype.forEach.call(root.querySelectorAll('textarea'), function (t, i) {
+            var cs = window.getComputedStyle(t);
+            var css = {};
+            keys.forEach(function (k) { css[k] = cs[k]; });
+            t.setAttribute('data-pdf-i', i);
+            snap[i] = { value: t.value, height: t.offsetHeight, css: css };
+        });
+        return snap;
+    }
+
+    function swapTextFieldsForPdf(doc, snap) {
+        Array.prototype.forEach.call(doc.querySelectorAll('textarea[data-pdf-i]'), function (t) {
+            var s = snap[t.getAttribute('data-pdf-i')];
+            if (!s) return;
+            var d = doc.createElement('div');
+            d.textContent = s.value;
+            var st = d.style;
+            Object.keys(s.css).forEach(function (k) { st[k] = s.css[k]; });
+            st.display = 'block';
+            st.boxSizing = 'border-box';
+            st.width = '100%';
+            st.maxWidth = '100%';
+            st.height = 'auto';
+            st.minHeight = s.height + 'px';
+            st.margin = '0';
+            st.background = 'transparent';
+            st.whiteSpace = 'pre-wrap';
+            st.overflowWrap = 'anywhere';
+            st.wordBreak = 'break-word';
+            st.overflow = 'visible';
+            t.parentNode.replaceChild(d, t);
+        });
+    }
+
     // ---------- Read a native date/time input into a friendly display string ----------
     function readValue(input) {
         if (!input) return '______________________';
@@ -34,7 +108,7 @@
     function fieldRowHtml(fieldEl) {
         var labelEl = fieldEl.querySelector('.info-label');
         var label = labelEl ? labelEl.textContent.trim() : '';
-        var input = fieldEl.querySelector('input');
+        var input = fieldEl.querySelector('input, textarea');
         return '<tr>' +
             '<td style="padding:3pt 6pt;font-weight:bold;width:35%;font-size:9pt;color:#555555;">' + esc(label) + '</td>' +
             '<td style="padding:3pt 6pt;border-bottom:1px solid #333333;">' + esc(readValue(input)) + '</td>' +
@@ -50,6 +124,7 @@
         btn.textContent = 'Preparing PDF…';
 
         var el = document.getElementById('printable');
+        var textSnap = snapshotTextFields(el);
 
         var opt = {
             margin: 0.4,
@@ -64,7 +139,9 @@
                 // shifted/cropped on the left on some desktop browsers even
                 // though it looks fine on mobile.
                 scrollX: -window.scrollX,
-                scrollY: -window.scrollY
+                scrollY: -window.scrollY,
+                // draw text fields as wrapped text (see swapTextFieldsForPdf)
+                onclone: function (doc) { swapTextFieldsForPdf(doc, textSnap); }
             },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
@@ -138,6 +215,8 @@
                     var labelEl = box.querySelector('.signature-label');
                     parts.push('<td style="width:50%;vertical-align:top;padding:8pt;border:1px dashed #999999;">');
                     parts.push('<p style="font-weight:bold;margin-bottom:16pt;">' + esc(labelEl ? labelEl.textContent.trim() : '') + '</p>');
+                    var sigEl = box.querySelector('.signature-input');
+                    parts.push('<p style="font-size:11pt;border-bottom:1px solid #333333;margin:0 0 8pt 0;">' + (sigEl && sigEl.value.trim() !== '' ? esc(sigEl.value) : '&nbsp;') + '</p>');
                     box.querySelectorAll('.info-field').forEach(function (f) {
                         var lab = f.querySelector('.info-label');
                         var labelText = lab ? lab.textContent.trim() : '';
@@ -151,7 +230,7 @@
                             });
                             valText = vals.length ? vals.join('  ') : '______________________';
                         } else {
-                            valText = readValue(f.querySelector('input'));
+                            valText = readValue(f.querySelector('input, textarea'));
                         }
                         parts.push('<p style="font-size:9pt;margin:2pt 0;"><b>' + esc(labelText) + '</b> ' + esc(valText) + '</p>');
                     });
