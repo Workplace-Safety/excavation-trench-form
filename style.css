@@ -349,3 +349,43 @@ h3 {
     .toolbar { justify-content: center; }
     .toolbar-title { width: 100%; text-align: center; margin-inline-end: 0; margin-bottom: 4pt; }
 }
+
+/* =====================================================================
+   TEXT WRAPPING + NO-CROP FIXES
+   Every text field is a <textarea> that grows as you type, so long text
+   drops to the next line instead of running off in one straight line.
+   ===================================================================== */
+textarea.info-input {
+    display: block;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.notes-area,
+.jha-table td textarea {
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow: hidden;
+    resize: none;
+}
+
+/* Tables can never grow wider than the page */
+.jha-table, .action-table, .crew-signin-table { table-layout: fixed; width: 100%; }
+.jha-table td, .action-table td, .crew-signin-table td { overflow-wrap: anywhere; word-break: break-word; }
+
+/* Grid / flex children may shrink instead of pushing past the right edge */
+.header-info > *, .atmospheric-grid > *, .signature-section > *,
+.status-summary > *, .ppe-grid > *, .date-time-row > *, .info-field { min-width: 0; }
+
+/* Signature line is now a typeable field that wraps like the others */
+textarea.signature-input {
+    margin-top: 32pt;
+    padding: 8pt 0 4pt 0;
+    font-size: 12pt;
+}
